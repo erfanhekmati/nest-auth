@@ -7,5 +7,6 @@ export default () => ({
         title: 'Your app swagger title goes here.',
         description: 'Your app swagger description goes here.',
         path: 'api-docs'
-    }
+    },
+    mongo_conn_str: process.env.MONGO_CONN_STR
 });
