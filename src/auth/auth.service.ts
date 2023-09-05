@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { Role } from 'src/users/enums/role.enum';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { Types as MongooseTypes } from 'mongoose';
 
 
 @Injectable()
@@ -21,7 +22,7 @@ export class AuthService {
         return await bcrypt.hash(text, salt);
     }
 
-    private async getTokens (userId: string, email: string, roles: Role[]) {
+    private async getTokens (userId: string | MongooseTypes.ObjectId , email: string, roles: Role[]) {
         return {
           access_token: await this.jwtService.sign(
             { userId, email, roles },
