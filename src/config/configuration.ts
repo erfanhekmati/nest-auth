@@ -8,5 +8,15 @@ export default () => ({
         description: 'Your app swagger description goes here.',
         path: 'api-docs'
     },
-    mongo_conn_str: process.env.MONGO_CONN_STR
+    mongo_conn_str: process.env.MONGO_CONN_STR,
+    jwt: {
+        access: {
+            secret: process.env.ACCESS_TOKEN_SECRET,
+            exp: process.env.ACCESS_TOKEN_EXPIRATION
+        },
+        refresh: {
+            secret: process.env.REFRESH_TOKEN_SECRET,
+            exp: process.env.REFRESH_TOKEN_EXPIRATION
+        }
+    }
 });

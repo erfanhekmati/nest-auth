@@ -20,6 +20,7 @@ export class UsersService {
                 firstName: 1,
                 lastName: 1,
                 email: 1,
+                roles: 1,
                 createdAt: 1,
                 updatedAt: 1
             });
@@ -41,6 +42,7 @@ export class UsersService {
                 firstName: 1,
                 lastName: 1,
                 email: 1,
+                roles: 1,
                 createdAt: 1,
                 updatedAt: 1
             });
@@ -63,6 +65,7 @@ export class UsersService {
                 firstName: 1,
                 lastName: 1,
                 email: 1,
+                roles: 1,
                 createdAt: 1,
                 updatedAt: 1
             });
@@ -86,8 +89,7 @@ export class UsersService {
         return false;
     }
 
-    public async craete(user: Partial<UserInterface>) {
-        if(await this.isEmailTaken(user.email)) throw new BadRequestException('Email is already taken.');
+    public async create(user: Partial<UserInterface>) {
         let newUser: any;
         try {
             newUser = await this.userModel.create(user);
@@ -107,8 +109,8 @@ export class UsersService {
             Logger.error(ex);
             throw new InternalServerErrorException("Internal server error.");
         }
-        const { _id, firstName, lastName, email } = user;
-        return { _id, firstName, lastName, email };
+        const { _id, firstName, lastName, email, roles } = user;
+        return { _id, firstName, lastName, email, roles };
     }
 
     public async changePasswordById(_id: string | MongooseTypes.ObjectId, newPassword: string) {
