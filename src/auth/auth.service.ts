@@ -60,7 +60,7 @@ export class AuthService {
         const tokens = await this.getTokens(newUser._id, newUser.email, newUser.roles);
     
         // Update refresh token
-        await this.usersService.updateHashedRt(newUser._id, await this.hashData(tokens.refresh_token));
+        await this.usersService.updateHashedRt(newUser._id.toString(), await this.hashData(tokens.refresh_token));
         
         return tokens;
     }
@@ -77,5 +77,9 @@ export class AuthService {
       this.usersService.updateHashedRt(user._id, await this.hashData(tokens.refresh_token))
       
       return tokens;
+    }
+
+    public async signOutLocal(userId: string) {
+      return await this.usersService.updateHashedRt(userId, null);
     }
 }

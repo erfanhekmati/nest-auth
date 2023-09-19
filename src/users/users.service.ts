@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, InternalServerErrorException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserInterface } from './interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -26,7 +26,7 @@ export class UsersService {
         return users;
     }
 
-    public async findById(_id: string | MongooseTypes.ObjectId) {
+    public async findById(_id: string) {
         const user = await this.userModel.findOne({
             _id,
             deleted: false
@@ -67,10 +67,10 @@ export class UsersService {
 
     public async create(user: Partial<UserInterface>) {
         const newUser = await this.userModel.create(user);
-        return await this.findById(newUser._id);
+        return await this.findById(newUser._id.toString());
     }
 
-    public async removeById(id: string | MongooseTypes.ObjectId) {
+    public async removeById(id: string) {
         const user = await this.findById(id);
         user.deleted = true;
         await user.save();
@@ -78,21 +78,21 @@ export class UsersService {
         return { _id, firstName, lastName, email, roles };
     }
 
-    public async changePasswordById(_id: string | MongooseTypes.ObjectId, newPassword: string) {
+    public async changePasswordById(_id:  string, newPassword: string) {
         const user = await this.findById(_id);
         user.password = newPassword;
         await user.save();
         return await this.findById(_id);
     }
 
-    public async updateHashedRt(_id: string | MongooseTypes.ObjectId, newHashedRT: string) {
+    public async updateHashedRt(_id: string, newHashedRT: string) {
         const user = await this.findById(_id);
         user.hashedRt = newHashedRT;
         await user.save();
         return await this.findById(_id);
     }
 
-    public async updateRoles(_id: string | MongooseTypes.ObjectId, newRoles: Role[]) {
+    public async updateRoles(_id: string, newRoles: Role[]) {
         const user = await this.findById(_id);
         user.roles = newRoles;
         await user.save();

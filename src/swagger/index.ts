@@ -10,6 +10,7 @@ export function SwaggerIntialize(app: INestApplication<any>) {
 
     // Creating swagger config
     const swaggerConfig = new DocumentBuilder()
+      .addBearerAuth()
       .setTitle(configService.get('swagger.title'))
       .setDescription(configService.get('swagger.description'))
       .setVersion(configService.get('app.version'))
