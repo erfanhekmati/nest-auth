@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { Model, Types as MongooseTypes } from 'mongoose';
 import { Role } from './enums/role.enum';
+import * as bcrypt from 'bcrypt';
 
 
 @Injectable()
@@ -96,5 +97,14 @@ export class UsersService {
         user.roles = newRoles;
         await user.save();
         return await this.findById(_id);
+    }
+
+    public async comparePasswords(email: string, password: string): Promise<boolean> {
+        const user = await this.userModel.findOne({ email });
+        if (user) {
+            const passMatches = await bcrypt.compare(password, user.password);
+            return passMatches;
+        }
+        return false;
     }
 }

@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { SignUpLocalDto } from './dtos/signup-local.dto';
 import { Tokens } from './types/tokens.type';
 import { UsersService } from 'src/users/users.service';
@@ -41,6 +41,11 @@ export class AuthService {
         }
     }
 
+    private async validateUser(email: string, pass: string): Promise<any> {
+      if(await this.usersService.comparePasswords(email, pass)) return await this.usersService.findByEmail(email);
+      return null;
+    }
+    
     public async signUpLocal(body: SignUpLocalDto): Promise<Tokens> {
         // Check for username availablitiy
         if(await this.usersService.isEmailTaken(body.email)) throw new BadRequestException('Email is already taken.');
@@ -58,5 +63,19 @@ export class AuthService {
         await this.usersService.updateHashedRt(newUser._id, await this.hashData(tokens.refresh_token));
         
         return tokens;
-      }
+    }
+
+    public async signInLocal(username: string, password: string): Promise<Tokens> {
+      // Validate user
+      const user = await this.validateUser(username, password);
+      if(!user) throw new UnauthorizedException('Invalid credentials.');
+  
+      // Get new tokens
+      const tokens = await this.getTokens(user._id, user.email, user.roles);
+  
+      // Update refresh token
+      this.usersService.updateHashedRt(user._id, await this.hashData(tokens.refresh_token))
+      
+      return tokens;
+    }
 }
