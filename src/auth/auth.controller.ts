@@ -1,10 +1,11 @@
-import { Controller, Post, HttpCode, HttpStatus, Body } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SignInLocalDto, SignUpLocalDto } from './dtos';
 import { Tokens } from './types/tokens.type';
 import { AuthService } from './auth.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { Public } from 'src/common/decorators';
+import { JwtRefreshAuthGuard } from 'src/common/guards';
 
 
 @ApiTags('Auth')
@@ -34,5 +35,15 @@ export class AuthController {
     @HttpCode(HttpStatus.OK)
     async signOut(@CurrentUser('userId') userId: string) {
         return this.authService.signOutLocal(userId);
+    }
+
+    @Public()
+    @ApiOperation({ summary: 'Refresh a token' })
+    @UseGuards(JwtRefreshAuthGuard)
+    @ApiBearerAuth()
+    @Post('local/refresh')
+    @HttpCode(HttpStatus.OK)
+    async refreshToken(@CurrentUser('userId') userId: string, @CurrentUser('refreshToken') refreshToken: string): Promise<Tokens> {
+        return this.authService.refreshTokenLocal(userId, refreshToken);
     }
 }

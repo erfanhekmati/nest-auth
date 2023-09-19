@@ -22,7 +22,7 @@ export class AuthService {
         return await bcrypt.hash(text, salt);
     }
 
-    private async getTokens (userId: string | MongooseTypes.ObjectId , email: string, roles: Role[]) {
+    private async getTokens (userId: string, email: string, roles: Role[]) {
         return {
           access_token: await this.jwtService.sign(
             { userId, email, roles },
@@ -57,7 +57,7 @@ export class AuthService {
         const newUser = await this.usersService.create(body);
     
         // Get new tokens
-        const tokens = await this.getTokens(newUser._id, newUser.email, newUser.roles);
+        const tokens = await this.getTokens(newUser._id.toString(), newUser.email, newUser.roles);
     
         // Update refresh token
         await this.usersService.updateHashedRt(newUser._id.toString(), await this.hashData(tokens.refresh_token));
@@ -81,5 +81,18 @@ export class AuthService {
 
     public async signOutLocal(userId: string) {
       return await this.usersService.updateHashedRt(userId, null);
+    }
+
+    public async refreshTokenLocal(userId: string, rt: string): Promise<Tokens> {
+      // Compare refresh tokens
+      const user = await this.usersService.compareRefreshTokens(userId, rt);
+  
+      // Get new tokens
+      const tokens = await this.getTokens(user._id.toString(), user.email, user.roles);
+  
+      // Update refresh token
+      await this.usersService.updateHashedRt(user._id.toString(), tokens.refresh_token);
+      
+      return tokens;
     }
 }

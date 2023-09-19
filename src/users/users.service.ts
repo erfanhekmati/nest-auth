@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { UserInterface } from './interfaces/user.interface';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -106,5 +106,13 @@ export class UsersService {
             return passMatches;
         }
         return false;
+    }
+
+    public async compareRefreshTokens(userId: string, rt: string) {
+        const user = await this.userModel.findById(userId);
+        if(!user) throw new ForbiddenException('Access denied.');
+        const rtMatches = await bcrypt.compare(rt, user.hashedRt);
+        if(!rtMatches) throw new ForbiddenException('Access denied.');
+        return user;
     }
 }
