@@ -18,5 +18,16 @@ export default () => ({
             secret: process.env.REFRESH_TOKEN_SECRET,
             exp: process.env.REFRESH_TOKEN_EXPIRATION
         }
+    },
+    mail: {
+        host: process.env.MAIL_HOST,
+        port: parseInt(process.env.MAIL_PORT, 10),
+        auth: {
+            user: process.env.MAIL_AUTH_USER,
+            pass: process.env.MAIL_AUTH_PASS
+        },
+        defaults: {
+            from: process.env.MAIL_DEFAULT_FROM
+        }
     }
 });
